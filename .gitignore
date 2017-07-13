@@ -1,0 +1,6 @@
+*.suo
+*.cache
+*/Thumbs.db
+/Source/*/bin/*
+/Source/*/obj/*
+/Source/*/CombatExtended.csproj.user
