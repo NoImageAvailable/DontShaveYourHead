@@ -1,7 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<name>Don't Shave Your Head</name>
-	<author>Dark Inquisitor, NoImageAvailable</author>
+	<name>Don't Shave Your Head A17.0</name>
+	<author>NoImageAvailable, Dark Inquisitor</author>
 	<targetVersion>0.17.1557</targetVersion>
-	<description>Version: 0.17.1.0\n\nAllows showing of hair below helmets.</description>
+	<url>https://ludeon.com/forums/index.php?topic=30920.0</url>	
+	<description>
+	Allows showing of hair below helmets and other headgear.
+	Currently support following hairstyles mods(load before):
+	- vanilla (default) hairstyles,
+	- Spoons Hair Mod,
+	- Nackblad Inc Rimhair.
+	</description>
 </ModMetaData>
