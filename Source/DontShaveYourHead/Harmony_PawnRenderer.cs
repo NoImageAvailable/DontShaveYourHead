@@ -15,14 +15,21 @@ namespace DontShaveYourHead
     {
         public static void DrawNowOrLaterShifted(Mesh mesh, Vector3 loc, Quaternion quat, Material mat, bool drawNow)
         {
-            loc.y += 0.001f;
+            loc.y -= 0.001f;
+            GenDraw.DrawMeshNowOrLater(mesh, loc, quat, mat, drawNow);
+        }
+
+        // Shifts hat render position upwards to allow proper rendering in portraits
+        public static void DrawHatNowOrLaterShifted(Mesh mesh, Vector3 loc, Quaternion quat, Material mat, bool drawNow)
+        {
+            loc.y += 0.03515625f;
             GenDraw.DrawMeshNowOrLater(mesh, loc, quat, mat, drawNow);
         }
 
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var codes = instructions.ToList();
-
+            
             // look for headGraphic block
             int idxHGfx = codes.FirstIndexOf(ci => ci.operand == typeof(PawnGraphicSet).GetField(nameof(PawnGraphicSet.headGraphic)));
             if (idxHGfx == -1)
@@ -72,7 +79,21 @@ namespace DontShaveYourHead
             codes[idxbodyDrawType - 2].opcode = OpCodes.Ldc_I4_0;        // 2nd use of bodyDrawType has <c>flag</c> we want to skip check of
             codes[idxbodyDrawType - 2].operand = null;
             codes[idxDrawMeshNowOrLater].operand = typeof(Harmony_PawnRenderer).GetMethod(nameof(Harmony_PawnRenderer.DrawNowOrLaterShifted));
+
+            // Get IL code of hatRenderedFrontOfFace to find hat render block
+            var hatBlockIndex = codes.FirstIndexOf(c => c.operand == typeof(ApparelProperties).GetField(nameof(ApparelProperties.hatRenderedFrontOfFace)));
             
+            // Find next DrawMeshNowOrLaterCall as it is responsible for drawing non-mask hats
+            for(int i = hatBlockIndex; i < codes.Count; i++)
+            {
+                var code = codes[i];
+                if (code.operand == typeof(GenDraw).GetMethod(nameof(GenDraw.DrawMeshNowOrLater)))
+                {
+                    Log.Warning("Found DrawMeshNowOrLater at i=" + i.ToString());
+                    code.operand = typeof(Harmony_PawnRenderer).GetMethod(nameof(Harmony_PawnRenderer.DrawHatNowOrLaterShifted));   // Reroute to custom method
+                    break;
+                }
+            }
 
             return codes;
         }
