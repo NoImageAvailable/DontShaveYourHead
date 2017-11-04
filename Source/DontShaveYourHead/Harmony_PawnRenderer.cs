@@ -13,12 +13,6 @@ namespace DontShaveYourHead
     [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal", new Type[] { typeof(Vector3), typeof(Quaternion), typeof(bool), typeof(Rot4), typeof(Rot4), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
     public static class Harmony_PawnRenderer
     {
-        public static void DrawNowOrLaterShifted(Mesh mesh, Vector3 loc, Quaternion quat, Material mat, bool drawNow)
-        {
-            loc.y -= 0.001f;
-            GenDraw.DrawMeshNowOrLater(mesh, loc, quat, mat, drawNow);
-        }
-
         // Shifts hat render position upwards to allow proper rendering in portraits
         public static void DrawHatNowOrLaterShifted(Mesh mesh, Vector3 loc, Quaternion quat, Material mat, bool drawNow)
         {
@@ -61,24 +55,8 @@ namespace DontShaveYourHead
                 return codes;
             }
 
-            var idxDrawMeshNowOrLater = -1;
-            for (int i = idxbodyDrawType; i > idxHGfx; i--)
-            {
-                if (codes[i].operand == typeof(GenDraw).GetMethod(nameof(GenDraw.DrawMeshNowOrLater)))
-                {
-                    idxDrawMeshNowOrLater = i;
-                    break;
-                }
-            }
-            if (idxDrawMeshNowOrLater == -1)
-            {
-                Log.Error("Could not find DrawMeshNowOrLater reference");
-                return codes;
-            }
-
             codes[idxbodyDrawType - 2].opcode = OpCodes.Ldc_I4_0;        // 2nd use of bodyDrawType has <c>flag</c> we want to skip check of
             codes[idxbodyDrawType - 2].operand = null;
-            codes[idxDrawMeshNowOrLater].operand = typeof(Harmony_PawnRenderer).GetMethod(nameof(Harmony_PawnRenderer.DrawNowOrLaterShifted));
 
             // Get IL code of hatRenderedFrontOfFace to find hat render block
             var hatBlockIndex = codes.FirstIndexOf(c => c.operand == typeof(ApparelProperties).GetField(nameof(ApparelProperties.hatRenderedFrontOfFace)));

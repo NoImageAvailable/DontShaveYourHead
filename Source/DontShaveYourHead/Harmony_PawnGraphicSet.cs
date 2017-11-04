@@ -35,24 +35,30 @@ namespace DontShaveYourHead
                 {
                     var coveredGroups = cur.def.apparel.bodyPartGroups;
                     var curCoverage = Coverage.None;
+
+                    // Find highest current max coverage
                     if (coveredGroups.Contains(BodyPartGroupDefOf.FullHead))
                     {
                         curCoverage = Coverage.FullHead;
                     }
-                    if (coveredGroups.Contains(BodyPartGroupDefOf.UpperHead))
+                    else if (coveredGroups.Contains(BodyPartGroupDefOf.UpperHead))
                     {
                         curCoverage = Coverage.UpperHead;
                     }
-                    if (coveredGroups.Contains(DefDatabase<BodyPartGroupDef>.GetNamed("Teeth")))
+                    else if (coveredGroups.Contains(BodyPartGroupDefOfDSYH.Teeth))
                     {
                         curCoverage = Coverage.Jaw;
                     }
+
+                    // Compare to stored max coverage
                     if (maxCoverage < curCoverage)
                     {
                         maxCoverage = curCoverage;
                     }
                 }
             }
+
+            // Set path appendage
             if (maxCoverage != Coverage.None)
             {
                 pathAppendString = maxCoverage.ToString();
