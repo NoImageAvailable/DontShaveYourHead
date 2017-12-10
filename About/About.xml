@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<name>Don't Shave Your Head A18</name>
+	<name>Don't Shave Your Head B18</name>
 	<author>NoImageAvailable, Dark Inquisitor</author>
-	<targetVersion>0.18.1704</targetVersion>
+	<targetVersion>0.18.1722</targetVersion>
 	<url>https://ludeon.com/forums/index.php?topic=30920.0</url>	
 	<description>
 	Allows showing of hair below helmets and other headgear.
@@ -10,6 +10,6 @@
 	- vanilla (default) hairstyles,
 	- Rimsenal Hair Pack,
 	- Spoons Hair Mod,
-	- Nackblad Inc Rimhair.
+	- Nackblad Inc Rimhair (both old and new).
 	</description>
 </ModMetaData>
