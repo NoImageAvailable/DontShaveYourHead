@@ -10,7 +10,7 @@ using Harmony;
 
 namespace DontShaveYourHead
 {
-    [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal", new Type[] { typeof(Vector3), typeof(Quaternion), typeof(bool), typeof(Rot4), typeof(Rot4), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
+    [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal", new Type[] { typeof(Vector3), typeof(float), typeof(bool), typeof(Rot4), typeof(Rot4), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
     public static class Harmony_PawnRenderer
     {
         // Shifts hat render position upwards to allow proper rendering in portraits
@@ -67,7 +67,6 @@ namespace DontShaveYourHead
                 var code = codes[i];
                 if (code.operand == typeof(GenDraw).GetMethod(nameof(GenDraw.DrawMeshNowOrLater)))
                 {
-                    Log.Warning("Found DrawMeshNowOrLater at i=" + i.ToString());
                     code.operand = typeof(Harmony_PawnRenderer).GetMethod(nameof(Harmony_PawnRenderer.DrawHatNowOrLaterShifted));   // Reroute to custom method
                     break;
                 }
