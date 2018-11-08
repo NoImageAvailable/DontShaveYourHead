@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Reflection.Emit;
 using RimWorld;
@@ -10,9 +11,10 @@ using Harmony;
 
 namespace DontShaveYourHead
 {
-    [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal", new Type[] { typeof(Vector3), typeof(Quaternion), typeof(bool), typeof(Rot4), typeof(Rot4), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
+    [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal", new Type[] { typeof(Vector3), typeof(float), typeof(bool), typeof(Rot4), typeof(Rot4), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
     public static class Harmony_PawnRenderer
     {
+
         // Shifts hat render position upwards to allow proper rendering in portraits
         public static void DrawHatNowOrLaterShifted(Mesh mesh, Vector3 loc, Quaternion quat, Material mat, bool drawNow)
         {
@@ -20,12 +22,24 @@ namespace DontShaveYourHead
             GenDraw.DrawMeshNowOrLater(mesh, loc, quat, mat, drawNow);
         }
 
+        // Reroute of hair DrawMeshNowOrLater call. Replaces normal hair mat with our own
+        public static void DrawHairReroute(Mesh mesh, Vector3 loc, Quaternion quat, Material mat, bool isPortrait, Pawn pawn, Rot4 facing)
+        {
+            // Check if we need to recalculate hair
+            if (!isPortrait || !Prefs.HatsOnlyOnMap)
+            {
+                mat = HairUtility.GetHairMatFor(pawn, facing);
+            }
+            GenDraw.DrawMeshNowOrLater(mesh, loc, quat, mat, isPortrait);
+        }
+
+
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var codes = instructions.ToList();
-            
+
             // look for headGraphic block
-            int idxHGfx = codes.FirstIndexOf(ci => ci.operand == typeof(PawnGraphicSet).GetField(nameof(PawnGraphicSet.headGraphic)));
+            var idxHGfx = codes.FirstIndexOf(ci => ci.operand == typeof(PawnGraphicSet).GetField(nameof(PawnGraphicSet.headGraphic)));
             if (idxHGfx == -1)
             {
                 Log.Error("Could not find headGraphics block start");
@@ -42,7 +56,7 @@ namespace DontShaveYourHead
             // head block contents atart at idxHGfx +2 , and at idxHGfxEnd -1
 
             var idxbodyDrawType = -1;
-            for (int i = idxHGfx + 2; i < idxHGfxEnd - 1; i++)
+            for (var i = idxHGfx + 2; i < idxHGfxEnd - 1; i++)
             {
                 if (codes[i].opcode == OpCodes.Ldarg_S && ((byte)6).Equals(codes[i].operand))
                 {
@@ -60,17 +74,54 @@ namespace DontShaveYourHead
 
             // Get IL code of hatRenderedFrontOfFace to find hat render block
             var hatBlockIndex = codes.FirstIndexOf(c => c.operand == typeof(ApparelProperties).GetField(nameof(ApparelProperties.hatRenderedFrontOfFace)));
-            
+
             // Find next DrawMeshNowOrLaterCall as it is responsible for drawing non-mask hats
-            for(int i = hatBlockIndex; i < codes.Count; i++)
+            for (var i = hatBlockIndex; i < codes.Count; i++)
             {
                 var code = codes[i];
                 if (code.operand == typeof(GenDraw).GetMethod(nameof(GenDraw.DrawMeshNowOrLater)))
                 {
-                    Log.Warning("Found DrawMeshNowOrLater at i=" + i.ToString());
                     code.operand = typeof(Harmony_PawnRenderer).GetMethod(nameof(Harmony_PawnRenderer.DrawHatNowOrLaterShifted));   // Reroute to custom method
                     break;
                 }
+            }
+
+            // Find hair DrawMeshNowOrLaterCall to reroute
+            var foundHairMatAt = false;
+            var headFacingCode = new CodeInstruction(OpCodes.Nop); // Code that pushes headFacing argument
+            for (var i = hatBlockIndex; i < codes.Count; i++)
+            {
+                // Find hair block
+                var code = codes[i];
+
+                if (code.operand == typeof(PawnGraphicSet).GetMethod(nameof(PawnGraphicSet.HairMatAt)))
+                {
+                    foundHairMatAt = true;
+                    headFacingCode = codes[i - 1];
+                }
+                // Find and replace hair draw call
+                if (foundHairMatAt
+                    && code.operand == typeof(GenDraw).GetMethod(nameof(GenDraw.DrawMeshNowOrLater)))
+                {
+                    // Reroute draw call
+                    code.operand = typeof(Harmony_PawnRenderer).GetMethod(nameof(DrawHairReroute));
+
+                    // Insert argument calls
+                    var newCodes = new List<CodeInstruction>
+                    {
+                        new CodeInstruction(OpCodes.Ldarg_0),
+                        new CodeInstruction(OpCodes.Ldfld, typeof(PawnRenderer).GetField("pawn", BindingFlags.NonPublic | BindingFlags.Instance)),
+                        new CodeInstruction(headFacingCode.opcode, headFacingCode.operand)
+                    };
+
+                    codes.InsertRange(i, newCodes);
+                    break;
+                }
+            }
+
+            if (!foundHairMatAt)
+            {
+                Log.Error("DSYH :: Failed to find HairMatAt call");
             }
 
             return codes;
