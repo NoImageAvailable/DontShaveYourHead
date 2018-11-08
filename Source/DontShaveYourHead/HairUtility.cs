@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using RimWorld;
-using Verse;
+﻿using RimWorld;
 using UnityEngine;
-using Harmony;
+using Verse;
 
 namespace DontShaveYourHead
 {
-    [HarmonyPatch(typeof(PawnGraphicSet), "ResolveApparelGraphics")]
-    public static class Harmony_PawnGraphicSet_ResolveApparelGraphics
+    public static class HairUtility
     {
         private enum Coverage
         {
@@ -20,16 +14,14 @@ namespace DontShaveYourHead
             FullHead
         }
 
-        public static void Postfix(PawnGraphicSet __instance)
+        public static Material GetHairMatFor(Pawn pawn, Rot4 facing)
         {
-            Pawn pawn = __instance.pawn;
-
-            // Define coverage-appropriate path
-            string pathAppendString = "";
+        // Define coverage-appropriate path
+        var pathAppendString = "";
 
             // Find maximum coverage of non-mask headwear
             var maxCoverage = Coverage.None;
-            foreach(Apparel cur in pawn.apparel.WornApparel)
+            foreach (var cur in pawn.apparel.WornApparel)
             {
                 if (!cur.def.apparel.hatRenderedFrontOfFace)
                 {
@@ -70,7 +62,7 @@ namespace DontShaveYourHead
             {
                 // Check if the path exists
                 var newTexPath = texPath + "/" + pathAppendString;
-                if (!ContentFinder<Texture2D>.Get(newTexPath + "_front", false))
+                if (!ContentFinder<Texture2D>.Get(newTexPath + "_south", false))
                 {
 #if DEBUG
                     Log.Warning("DSYH :: could not find texture at " + texPath);
@@ -82,7 +74,7 @@ namespace DontShaveYourHead
                     texPath = newTexPath;
                 }
             }
-            __instance.hairGraphic = GraphicDatabase.Get<Graphic_Multi>(texPath, ShaderDatabase.Cutout, Vector2.one, pawn.story.hairColor); // Set new graphic
+            return GraphicDatabase.Get<Graphic_Multi>(texPath, ShaderDatabase.Cutout, Vector2.one, pawn.story.hairColor).MatAt(facing); // Set new graphic
         }
     }
 }
