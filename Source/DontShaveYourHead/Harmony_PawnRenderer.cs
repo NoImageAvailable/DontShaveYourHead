@@ -14,13 +14,7 @@ namespace DontShaveYourHead
     [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal", new Type[] { typeof(Vector3), typeof(float), typeof(bool), typeof(Rot4), typeof(Rot4), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
     public static class Harmony_PawnRenderer
     {
-
-        // Shifts hat render position upwards to allow proper rendering in portraits
-        public static void DrawHatNowOrLaterShifted(Mesh mesh, Vector3 loc, Quaternion quat, Material mat, bool drawNow)
-        {
-            loc.y += 0.03515625f;
-            GenDraw.DrawMeshNowOrLater(mesh, loc, quat, mat, drawNow);
-        }
+        private const float DrawOffset = 0.03515625f;
 
         // Reroute of hair DrawMeshNowOrLater call. Replaces normal hair mat with our own
         public static void DrawHairReroute(Mesh mesh, Vector3 loc, Quaternion quat, Material mat, bool isPortrait, Pawn pawn, Rot4 facing)
@@ -36,6 +30,48 @@ namespace DontShaveYourHead
 
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
+            const float hatOffset = 0.03125f;
+            var writing = false;
+
+            foreach (var code in instructions)
+            {
+                if (code.opcode == OpCodes.Ldloc_S)
+                {
+                    Log.Message($"DSYH :: Operand type is {code.operand.GetType()} for {code.opcode} : {code.operand}");
+                }
+                // Apply draw offset for hat rendering
+                if (code.opcode == OpCodes.Ldc_R4 && (float)code.operand == hatOffset)
+                {
+                    yield return new CodeInstruction(OpCodes.Ldc_R4, DrawOffset + hatOffset);
+                }
+                // Skip hide hair flag
+                else if (code.opcode == OpCodes.Ldloc_S && code.operand is LocalBuilder b && b.LocalIndex == 13)
+                {
+                    var newCode = new CodeInstruction(OpCodes.Ldc_I4_0) { labels = code.labels };
+                    yield return newCode;
+                }
+                // Replace hair draw mesh call
+                else if (code.opcode == OpCodes.Callvirt && code.operand == AccessTools.Method(typeof(PawnGraphicSet), nameof(PawnGraphicSet.HairMatAt)))
+                {
+                    writing = true;
+                    yield return code;
+                }
+                else if (writing && code.opcode == OpCodes.Call && code.operand == AccessTools.Method(typeof(GenDraw), nameof(GenDraw.DrawMeshNowOrLater)))
+                {
+                    writing = false;
+
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(PawnRenderer), "pawn"));
+                    yield return new CodeInstruction(OpCodes.Ldarg, 5);
+                    yield return new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(Harmony_PawnRenderer), nameof(DrawHairReroute)));
+                }
+                // Default
+                else
+                {
+                    yield return code;
+                }
+            }
+            /*
             var codes = instructions.ToList();
 
             // look for headGraphic block
@@ -124,7 +160,7 @@ namespace DontShaveYourHead
                 Log.Error("DSYH :: Failed to find HairMatAt call");
             }
 
-            return codes;
+            return codes;*/
         }
     }
 }
