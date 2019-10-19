@@ -35,10 +35,6 @@ namespace DontShaveYourHead
 
             foreach (var code in instructions)
             {
-                if (code.opcode == OpCodes.Ldloc_S)
-                {
-                    Log.Message($"DSYH :: Operand type is {code.operand.GetType()} for {code.opcode} : {code.operand}");
-                }
                 // Apply draw offset for hat rendering
                 if (code.opcode == OpCodes.Ldc_R4 && (float)code.operand == hatOffset)
                 {
