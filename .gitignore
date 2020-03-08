@@ -1,10 +1,9 @@
 *.suo
 *.cache
 */Thumbs.db
-/Source/.vs/*
-/Source/CombatExtended/bin/*
-/Source/CombatExtended/obj/*
-/Source/CombatExtended/CombatExtended.csproj.user
+/Source/DontShaveYourHead/.vs/*
+/Source/DontShaveYourHead/obj/*
+/Source/DontShaveYourHead/packages/*
  
 # ReSharper is a .NET coding add-in
 _ReSharper*/
@@ -14,5 +13,6 @@ _ReSharper*/
 # Ignore RimWorld assemblies 
 Assembly-CSharp.dll 
 UnityEngine.dll 
+UnityEngine.*.dll 
 
 .idea/

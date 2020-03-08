@@ -1,8 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<name>Don't Shave Your Head 1.0</name>
+	<name>Don't Shave Your Head 1.1</name>
 	<author>NoImageAvailable, Dark Inquisitor</author>
-	<targetVersion>1.0.2059</targetVersion>
+	<supportedVersions>
+		<li>1.1</li>
+	</supportedVersions>
+	<packageId>rw.dontshaveyourhead</packageId>
 	<url>https://ludeon.com/forums/index.php?topic=30920.0</url>	
 	<description>
 	Allows showing of hair below helmets and other headgear.
@@ -12,4 +15,15 @@
 	- Spoons Hair Mod,
 	- Nackblad Inc Rimhair (both old and new).
 	</description>
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+		</li>
+	</modDependencies>
+	<loadAfter>
+		<li>Ludeon.RimWorld</li>
+		<li>Ludeon.RimWorld.Royalty</li>
+		<li>brrainz.harmony</li>
+	</loadAfter>
 </ModMetaData>

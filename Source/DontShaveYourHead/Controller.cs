@@ -6,7 +6,7 @@ using System.Reflection;
 using RimWorld;
 using Verse;
 using UnityEngine;
-using Harmony;
+using HarmonyLib;
 
 namespace DontShaveYourHead
 {
@@ -14,7 +14,7 @@ namespace DontShaveYourHead
     {
         public Controller(ModContentPack content) : base(content)
         {
-            HarmonyInstance.Create("DontShaveYourHead-Harmony").PatchAll(Assembly.GetExecutingAssembly());
+            new Harmony("DontShaveYourHead-Harmony").PatchAll(Assembly.GetExecutingAssembly());
         }
     }
 }

@@ -7,11 +7,11 @@ using System.Reflection.Emit;
 using RimWorld;
 using Verse;
 using UnityEngine;
-using Harmony;
+using HarmonyLib;
 
 namespace DontShaveYourHead
 {
-    [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal", new Type[] { typeof(Vector3), typeof(float), typeof(bool), typeof(Rot4), typeof(Rot4), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
+    [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal", new Type[] { typeof(Vector3), typeof(float), typeof(bool), typeof(Rot4), typeof(Rot4), typeof(RotDrawMode), typeof(bool), typeof(bool), typeof(bool) })]
     public static class Harmony_PawnRenderer
     {
         private const float DrawOffset = 0.03515625f;
@@ -41,18 +41,18 @@ namespace DontShaveYourHead
                     yield return new CodeInstruction(OpCodes.Ldc_R4, DrawOffset + hatOffset);
                 }
                 // Skip hide hair flag
-                else if (code.opcode == OpCodes.Ldloc_S && code.operand is LocalBuilder b && b.LocalIndex == 13)
+                else if (code.opcode == OpCodes.Ldloc_S && code.operand is LocalBuilder b && b.LocalIndex == 12)
                 {
                     var newCode = new CodeInstruction(OpCodes.Ldc_I4_0) { labels = code.labels };
                     yield return newCode;
                 }
                 // Replace hair draw mesh call
-                else if (code.opcode == OpCodes.Callvirt && code.operand == AccessTools.Method(typeof(PawnGraphicSet), nameof(PawnGraphicSet.HairMatAt)))
+                else if (code.opcode == OpCodes.Callvirt && (MethodInfo)code.operand == AccessTools.Method(typeof(PawnGraphicSet), nameof(PawnGraphicSet.HairMatAt)))
                 {
                     writing = true;
                     yield return code;
                 }
-                else if (writing && code.opcode == OpCodes.Call && code.operand == AccessTools.Method(typeof(GenDraw), nameof(GenDraw.DrawMeshNowOrLater)))
+                else if (writing && code.opcode == OpCodes.Call && (MethodInfo)code.operand == AccessTools.Method(typeof(GenDraw), nameof(GenDraw.DrawMeshNowOrLater)))
                 {
                     writing = false;
 
