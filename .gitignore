@@ -1,9 +1,9 @@
 *.suo
 *.cache
 */Thumbs.db
-/Source/DontShaveYourHead/.vs/*
-/Source/DontShaveYourHead/obj/*
-/Source/DontShaveYourHead/packages/*
+/Source/DontShaveYourHead*/.vs/*
+/Source/DontShaveYourHead*/obj/*
+/Source/DontShaveYourHead*/packages/*
  
 # ReSharper is a .NET coding add-in
 _ReSharper*/
