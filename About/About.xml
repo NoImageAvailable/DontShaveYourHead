@@ -3,6 +3,7 @@
 	<name>Don't Shave Your Head 1.1</name>
 	<author>NoImageAvailable, Dark Inquisitor</author>
 	<supportedVersions>
+		<li>1.0</li>
 		<li>1.1</li>
 	</supportedVersions>
 	<packageId>rw.dontshaveyourhead</packageId>
