@@ -47,7 +47,7 @@ namespace DontShaveYourHead
 			// if there's something covering the hair
 			if (maxCoverage != Coverage.None)
 			{
-				if (textureCache.ContainsKey(texPath))
+				if (Controller.settings.useFallbackTexture && textureCache.ContainsKey(texPath))
 				{
 					//get texture from cache
 					texPath = textureCache[texPath];
@@ -58,24 +58,34 @@ namespace DontShaveYourHead
 					if (!ContentFinder<Texture2D>.Get($"{texPath}/{maxCoverageString}_south", false))
 					{
 						//couldn't find a custom texture, get a semi-random fallback
-
-						//get lowest pixel to estimate hair length
-						int lowestPixelPercentage = getLowestPixelPercentage(pawn, texPath, Rot4.East);
-
-						//get the fallback hairs for the pixel range
-						var fallback = fallbackTextures.Where(d => d.PixelRangePercent.ContainsValue(lowestPixelPercentage)).FirstOrDefault().Textures;
-
-						if (fallback.Any())
+						if (Controller.settings.useFallbackTexture)
 						{
-							//get hair name from path
-							var currentHairName = texPath.Split('/').Last();
+							//get lowest pixel to estimate hair length
+							int lowestPixelPercentage = getLowestPixelPercentage(pawn, texPath, Rot4.East);
 
-							//get the closest fallback
-							var closestFallback = fallback.OrderBy(h => h.Name).OrderByDescending(h => h.Name.CompareTo(currentHairName)).First();
+							//get the fallback hairs for the pixel range
+							var fallback = fallbackTextures.Where(d => d.PixelRangePercent.ContainsValue(lowestPixelPercentage)).FirstOrDefault().Textures;
 
-							//adding to cache
-							textureCache.Add(texPath, closestFallback.Path);
-							texPath = closestFallback.Path;
+							if (fallback.Any())
+							{
+								//get hair name from path
+								var currentHairName = texPath.Split('/').Last();
+
+								//get the closest fallback
+								var closestFallback = fallback.OrderBy(h => h.Name).OrderByDescending(h => h.Name.CompareTo(currentHairName)).First();
+
+								//adding to cache
+								if (Controller.settings.logFallback)
+									Log.Message($"DSYH: {pawn.Name} | {texPath} | {closestFallback.Path}");
+
+								textureCache.Add(texPath, closestFallback.Path);
+								texPath = closestFallback.Path;
+							}
+							else
+							{
+								//if can't find a fallback texture, return shaved hair
+								return HairDefOf.Shaved.texPath;
+							}
 						}
 						else
 						{
