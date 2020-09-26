@@ -16,7 +16,6 @@ namespace DontShaveYourHead
 		public Controller(ModContentPack content) : base(content)
 		{
 			settings = GetSettings<DontShaveYourHeadSettings>();
-
 			new Harmony("DontShaveYourHead-Harmony").PatchAll(Assembly.GetExecutingAssembly());
 		}
 
@@ -43,9 +42,9 @@ namespace DontShaveYourHead
 
 		public override void WriteSettings()
 		{
-			//when settings get written re-render portraits
 			if (Find.Maps != null)
 			{
+				//when settings get written re-render portraits
 				foreach (var map in Find.Maps)
 				{
 					foreach (var pawn in map.mapPawns.AllPawnsSpawned.Where(p => p.IsColonist))
@@ -54,7 +53,6 @@ namespace DontShaveYourHead
 					}
 				}
 			}
-
 			base.WriteSettings();
 		}
 	}
