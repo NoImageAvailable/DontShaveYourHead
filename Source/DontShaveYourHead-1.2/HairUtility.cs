@@ -32,84 +32,6 @@ namespace DontShaveYourHead
 			// Find maximum coverage of non-mask headwear
 			var maxCoverage = getMaxCoverage(pawn);
 
-<<<<<<< HEAD
-			// Set hair graphics to headgear-appropriate texture
-			var texPath = pawn.story.hairDef.texPath;
-
-			// Set path appendage
-			if (maxCoverage != Coverage.None)
-			{
-				string maxCoverageString = maxCoverage.ToString();
-
-				//ids for cache
-				string textureId = $"{texPath}_{maxCoverageString}_{facing.ToStringWord()}";
-				if (!textureCache.ContainsKey(textureId))
-				{
-					// Check if the path exists
-					var newTexPath = texPath + "/" + maxCoverageString;
-
-					if (!ContentFinder<Texture2D>.Get(newTexPath + "_south", false))
-					{
-						//couldn't find a custom texture, get a semi-random default custom
-
-						//load the current hair
-						var material = GraphicDatabase.Get<Graphic_Multi>(texPath, ShaderDatabase.Cutout, Vector2.one, pawn.story.hairColor).MatAt(Rot4.South);
-
-						//get current hair texture
-						Texture2D hairTexture = getReadableTexture((Texture2D)material.mainTexture);
-
-						//find the lowest pixel, to get hair length
-						int lowestPixel = -1;
-
-						//start from bottom row, iterate to top
-						for (int y = 0; y < hairTexture.height; y++)
-						{
-							//get pixels one row at a time
-							var pixelsRow = hairTexture.GetPixels(0, y, hairTexture.width, 1);
-
-							if (pixelsRow.Any(c => c != Color.clear))
-							{
-								//if we find a non clear pixel, set lowestPixel and break;
-								lowestPixel = y;
-								break;
-							}
-						}
-
-						//get the default customs for the pixel range
-						var customHairs = defaultCustomHairs.Where(d => d.PixelRange.ContainsValue(lowestPixel)).FirstOrDefault().Hairs;
-
-						//get just the hair name
-						var currentHairName = texPath.Split('/').Last();
-
-						//get the closest default custom name
-						var getClosestDefault = customHairs.OrderByDescending(h => h.Name.CompareTo(currentHairName)).First();
-
-						//check for facial hair?
-						newTexPath = getClosestDefault.Path + "/" + maxCoverageString;
-
-
-						//if (maxCoverageString != "Jaw")
-						//newTexPath = HairDefOf.Shaved.texPath;
-
-						textureCache.Add(textureId, newTexPath);
-						texPath = newTexPath;
-					}
-					else
-					{
-						texPath = newTexPath;
-					}
-				}
-				else
-				{
-					//get original texture from cache
-					texPath = textureCache[textureId];
-				}
-
-			}
-
-
-			return GraphicDatabase.Get<Graphic_Multi>(texPath, ShaderDatabase.Cutout, Vector2.one, pawn.story.hairColor).MatAt(facing); // Set new graphic
-=======
 			string texPath = getTexPath(pawn, maxCoverage);
 
 			return GraphicDatabase.Get<Graphic_Multi>(texPath, ShaderDatabase.Cutout, Vector2.one, pawn.story.hairColor).MatAt(facing); // Set new graphic
@@ -208,7 +130,6 @@ namespace DontShaveYourHead
 			}
 
 			return -1;
->>>>>>> fallback-texture
 		}
 
 		private static Coverage getMaxCoverage(Pawn pawn)
@@ -268,15 +189,6 @@ namespace DontShaveYourHead
 		}
 
 
-<<<<<<< HEAD
-		private struct DefaultCustomHair
-		{
-			public Range<int> PixelRange { get; set; }
-			public List<CustomHair> Hairs { get; set; }
-		}
-
-		private struct CustomHair
-=======
 		private struct TexturesForRange
 		{
 			public Range<int> PixelRangePercent { get; set; }
@@ -284,100 +196,17 @@ namespace DontShaveYourHead
 		}
 
 		private struct CustomTexture
->>>>>>> fallback-texture
 		{
 			public string Name { get; set; }
 			public string Path { get; set; }
 
-<<<<<<< HEAD
-			public CustomHair(string name, string path)
-=======
 			public CustomTexture(string name, string path)
->>>>>>> fallback-texture
 			{
 				this.Name = name;
 				this.Path = path;
 			}
 		}
 
-<<<<<<< HEAD
-		private static List<DefaultCustomHair> defaultCustomHairs = new List<DefaultCustomHair>()
-		{
-			new DefaultCustomHair() {
-				PixelRange = new Range<int>(128, 128),
-				Hairs = new List<CustomHair>()
-				{
-					new CustomHair("", "")
-				}
-			},
-
-			new DefaultCustomHair() { //short
-				PixelRange = new Range<int>(50, 128),
-				Hairs = new List<CustomHair>() {
-					new CustomHair("AniEmo", "Hairs/AniEmo"),
-					new CustomHair("Neat", "Hairs/Neat"),
-					new CustomHair("Vintage", "Hairs/Vintage"),
-					new CustomHair("ED", "Hair/ED"),
-					new CustomHair("jack", "Hair/nbi_jack"),
-					new CustomHair("jeffy", "Hair/nbi_jeffy"),
-					new CustomHair("panda", "Hair/nbi_panda"),
-					new CustomHair("tom", "Hair/nbi_tom"),
-					new CustomHair("trent", "Hair/nbi_trent"),
-					new CustomHair("Rei", "Hair/RimNGE_Rei"),
-					new CustomHair("Frat", "Hair/SPSFrat"),
-					new CustomHair("Jay", "Hair/SPSJay"),
-					new CustomHair("Leon", "Hair/SPSLeon"),
-					new CustomHair("Lulu", "Hair/SPSLulu"),
-					new CustomHair("Usagi", "Hair/SPSUsagi"),
-					new CustomHair("VC", "Hair/VC"),
-					new CustomHair("Bob", "Things/Pawn/Humanlike/Hairs/Bob"),
-					new CustomHair("Burgundy", "Things/Pawn/Humanlike/Hairs/Burgundy"),
-					new CustomHair("Mess", "Things/Pawn/Humanlike/Hairs/Mess"),
-					new CustomHair("Mop", "Things/Pawn/Humanlike/Hairs/Mop")
-				}
-			},
-
-			new DefaultCustomHair() { //medium
-				PixelRange = new Range<int>(20, 49),
-				Hairs = new List<CustomHair>() {
-					new CustomHair("FemShort_back", "Hairs/FemShort_back"),
-					new CustomHair("StraightShort", "Hairs/StraightShort"),
-					new CustomHair("WavyShort", "Hairs/WavyShort"),
-					new CustomHair("CA", "Hair/CA"),
-					new CustomHair("KE", "Hair/KE"),
-					new CustomHair("nbi_cleo", "Hair/nbi_cleo"),
-					new CustomHair("nbi_marcie", "Hair/nbi_marcie"),
-					new CustomHair("nbi_tiffany", "Hair/nbi_tiffany"),
-					new CustomHair("OA", "Hair/OA"),
-					new CustomHair("PA", "Hair/PA"),
-					new CustomHair("SM", "Hair/SM"),
-					new CustomHair("Flora", "Hair/SPSFlora"),
-					new CustomHair("Kat", "Hair/SPSKat"),
-					new CustomHair("Slick", "Hair/SPSSlick"),
-					new CustomHair("TS", "Hair/TS"),
-					new CustomHair("Xeva", "Hair/Xeva"),
-					new CustomHair("XT", "Hair/XT"),
-					new CustomHair("Curly", "Things/Pawn/Humanlike/Hairs/Curly"),
-					new CustomHair("Flowy", "Things/Pawn/Humanlike/Hairs/Flowy"),
-					new CustomHair("Long", "Things/Pawn/Humanlike/Hairs/Long"),
-					new CustomHair("Wavy", "Things/Pawn/Humanlike/Hairs/Wavy")
-				}
-			},
-
-			new DefaultCustomHair() { //long
-				PixelRange = new Range<int>(0, 19),
-				Hairs = new List<CustomHair>() {
-					new CustomHair("ClassyF", "Hairs/ClassyF"),
-					new CustomHair("Hasslefree", "Hairs/Hasslefree"),
-					new CustomHair("Ponytail", "Hairs/Ponytail"),
-					new CustomHair("StraightLong", "Hairs/StraightLong"),
-					new CustomHair("MA", "Hair/MA"),
-					new CustomHair("curly", "Hair/nbi_curly"),
-					new CustomHair("quinn", "Hair/nbi_quinn"),
-					new CustomHair("sandi", "Hair/nbi_sandi"),
-					new CustomHair("Asuka", "Hair/RimNGE_Asuka"),
-					new CustomHair("Princess", "Things/Pawn/Humanlike/Hairs/Princess")
-=======
 		private static List<TexturesForRange> fallbackTextures = new List<TexturesForRange>()
 		{
 			new TexturesForRange() { //short
@@ -423,24 +252,11 @@ namespace DontShaveYourHead
 					new CustomTexture("t", "Hair/nbi_regal"),
 					new CustomTexture("w", "Hair/nbi_sandi"),
 					new CustomTexture("z", "Hair/nbi_witch")
->>>>>>> fallback-texture
 				}
 			}
 		};
 	}
-<<<<<<< HEAD
-	public static class Extensions
-	{
-		public static T[] Slice<T>(this T[] source, int index, int length)
-		{
-			T[] slice = new T[length];
-			Array.Copy(source, index, slice, 0, length);
-			return slice;
-		}
-	}
-=======
 
->>>>>>> fallback-texture
 
 	/// <summary>The Range class.</summary>
 	/// <typeparam name="T">Generic parameter.</typeparam>

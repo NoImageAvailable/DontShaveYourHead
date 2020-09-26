@@ -6,25 +6,17 @@ using System.Reflection;
 using RimWorld;
 using Verse;
 using UnityEngine;
-using Harmony;
+using HarmonyLib;
 
 namespace DontShaveYourHead
 {
-    public class Controller : Mod
-<<<<<<< HEAD
-    {
-        public Controller(ModContentPack content) : base(content)
-        {
-            HarmonyInstance.Create("DontShaveYourHead-Harmony").PatchAll(Assembly.GetExecutingAssembly());
-        }
-    }
-=======
+	public class Controller : Mod
 	{
 		public static DontShaveYourHeadSettings settings;
 		public Controller(ModContentPack content) : base(content)
 		{
 			settings = GetSettings<DontShaveYourHeadSettings>();
-			HarmonyInstance.Create("DontShaveYourHead-Harmony").PatchAll(Assembly.GetExecutingAssembly());
+			new Harmony("DontShaveYourHead-Harmony").PatchAll(Assembly.GetExecutingAssembly());
 		}
 
 
@@ -50,18 +42,21 @@ namespace DontShaveYourHead
 
 		public override void WriteSettings()
 		{
-			//when settings get written re-render portraits
-			foreach (var map in Find.Maps)
+			if (Find.Maps != null)
 			{
-				foreach (var pawn in map.mapPawns.AllPawnsSpawned.Where(p => p.IsColonist))
+				//when settings get written re-render portraits
+				foreach (var map in Find.Maps)
 				{
-					PortraitsCache.SetDirty(pawn);
+					foreach (var pawn in map.mapPawns.AllPawnsSpawned.Where(p => p.IsColonist))
+					{
+						PortraitsCache.SetDirty(pawn);
+					}
 				}
 			}
-
 			base.WriteSettings();
 		}
 	}
+
 	public class DontShaveYourHeadSettings : ModSettings
 	{
 		public bool useFallbackTexture;
@@ -78,5 +73,4 @@ namespace DontShaveYourHead
 		}
 
 	}
->>>>>>> fallback-texture
 }

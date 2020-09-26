@@ -3,4 +3,11 @@
     <li>/</li>
     <li>v1.1</li>
   </v1.1>
+<<<<<<< HEAD
+=======
+  <v1.2>
+    <li>/</li>
+    <li>v1.2</li>
+  </v1.2>
+>>>>>>> fallback-texture
 </loadFolders>

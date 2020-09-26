@@ -14,5 +14,6 @@ _ReSharper*/
 Assembly-CSharp.dll 
 UnityEngine.dll 
 UnityEngine.*.dll 
+0Harmony.xml
 
 .idea/

@@ -17,7 +17,11 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
+<<<<<<< HEAD
     <OutputPath>..\..\..\..\obj\Debug\</OutputPath>
+=======
+    <OutputPath>obj\Debug\</OutputPath>
+>>>>>>> fallback-texture
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +29,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
+<<<<<<< HEAD
     <OutputPath>..\..\..\..\obj\Release\</OutputPath>
+=======
+    <OutputPath>..\..\Assemblies\</OutputPath>
+>>>>>>> fallback-texture
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
