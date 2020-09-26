@@ -18,6 +18,7 @@ namespace DontShaveYourHead
 			settings = GetSettings<DontShaveYourHeadSettings>();
 
 			new Harmony("DontShaveYourHead-Harmony").PatchAll(Assembly.GetExecutingAssembly());
+
 		}
 
 
