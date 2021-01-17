@@ -17,11 +17,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-<<<<<<< HEAD
-    <OutputPath>..\..\..\..\obj\Debug\</OutputPath>
-=======
     <OutputPath>obj\Debug\</OutputPath>
->>>>>>> fallback-texture
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,11 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-<<<<<<< HEAD
-    <OutputPath>..\..\..\..\obj\Release\</OutputPath>
-=======
-    <OutputPath>..\..\Assemblies\</OutputPath>
->>>>>>> fallback-texture
+    <OutputPath>obj\Release\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -64,12 +56,34 @@
     <Compile Include="HairDefOf.cs" />
     <Compile Include="HairUtility.cs" />
     <Compile Include="Harmony_PawnRenderer.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+    copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)..\..\Assemblies\$(ProjectName).dll"
+) else (
+	rem xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\About\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\About\"
+	
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\Assemblies\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\Assemblies\"
+	
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\Languages\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\Languages\"
+	
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\v1.1\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\v1.1\"
+	
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\v1.2\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\v1.2\"
+	
+	echo F|xcopy /C /Y "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\LoadFolders.xml" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\LoadFolders.xml"
+	
+    copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\Assemblies\$(ProjectName).dll"
+	
+	start C:\Share\Games\RimWorld.v1.0.2282\RimWorldWin64.exe -quicktest
+)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

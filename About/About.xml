@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
 	<name>Don't Shave Your Head 1.2</name>
-	<author>NoImageAvailable, Dark Inquisitor</author>
+	<author>NoImageAvailable, Dark Inquisitor, gaberad, Naiyasfury</author>
 	<supportedVersions>
 		<li>1.0</li>
 		<li>1.1</li>
@@ -10,12 +10,18 @@
 	<packageId>rw.dontshaveyourhead</packageId>
 	<url>https://ludeon.com/forums/index.php?topic=30920.0</url>	
 	<description>
-	Allows showing of hair below helmets and other headgear.
-	Currently support following hairstyles mods(load before):
-	- vanilla (default) hairstyles,
-	- Rimsenal Hair Pack,
-	- Spoons Hair Mod,
-	- Nackblad Inc Rimhair (both old and new).
+Allows showing of hair below helmets and other headgear without clipping.
+
+Does this in 2 ways:
+	if the hairstyle has a custom texture (from the list below) it will use that,
+	otherwise, if there is no custom texture, it will choose a semi-random texture from the list below (if enabled, on by default). This way it should be compatible with other hairstyle mods even though they aren't explicitly 'supported'
+
+Current hairstyles mods with custom textures(load mods before this one):
+- vanilla (default) hairstyles,
+- Rimsenal Hair Pack,
+- Spoons Hair Mod,
+- Nackblad Inc Rimhair (both old and new).
+- Vanilla Hair Expanded
 	</description>
 	<modDependencies>
 		<li>

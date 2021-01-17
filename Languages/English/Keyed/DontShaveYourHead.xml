@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
   <DSYHTitle>Dont Shave Your Head</DSYHTitle>
-  <SettingUseFallback>Use Fallback Texture</SettingUseFallback>
+  <SettingUseFallback>Use Fallback Texture (Requires Restart)</SettingUseFallback>
   <SettingUseFallbackDesc>Use a fallback texture if no custom texture exists for the hair style.</SettingUseFallbackDesc>
-  <SettingLogFallback>Log Fallback</SettingLogFallback>
+  <SettingLogFallback>Log Fallback (Requires Restart)</SettingLogFallback>
   <SettingLogFallbackDesc>Logs the fallback texture to the debug log.</SettingLogFallbackDesc>
 </LanguageData>

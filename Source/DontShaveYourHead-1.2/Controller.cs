@@ -13,9 +13,26 @@ namespace DontShaveYourHead
 	public class Controller : Mod
 	{
 		public static DontShaveYourHeadSettings settings;
+		public static IHairUtility HairUtility; 
+
 		public Controller(ModContentPack content) : base(content)
 		{
 			settings = GetSettings<DontShaveYourHeadSettings>();
+
+			ILogger logger = new Logger_Nothing(); //default logger to log to nothing
+			if (settings.LogFallback)
+			{
+				logger = new Logger(); //if logging fallback texture message, log to rimworld log
+			}
+
+			if (settings.UseFallbackTexture) 
+			{
+				HairUtility = new HairUtility_Fallback(logger); //if using fallbacktextures, use a _Fallback instance
+			}
+			else
+			{
+				HairUtility = new HairUtility(logger); //otherwise use a default instance
+			}
 			new Harmony("DontShaveYourHead-Harmony").PatchAll(Assembly.GetExecutingAssembly());
 		}
 
@@ -24,8 +41,8 @@ namespace DontShaveYourHead
 		{
 			Listing_Standard listingStandard = new Listing_Standard();
 			listingStandard.Begin(inRect);
-			listingStandard.CheckboxLabeled("SettingUseFallback".Translate(), ref settings.useFallbackTexture, "SettingUseFallbackDesc".Translate());
-			listingStandard.CheckboxLabeled("SettingLogFallback".Translate(), ref settings.logFallback, "SettingLogFallbackDesc".Translate());
+			listingStandard.CheckboxLabeled("SettingUseFallback".Translate(), ref settings.UseFallbackTexture, "SettingUseFallbackDesc".Translate());
+			listingStandard.CheckboxLabeled("SettingLogFallback".Translate(), ref settings.LogFallback, "SettingLogFallbackDesc".Translate());
 			listingStandard.End();
 			base.DoSettingsWindowContents(inRect);
 		}
@@ -59,16 +76,16 @@ namespace DontShaveYourHead
 
 	public class DontShaveYourHeadSettings : ModSettings
 	{
-		public bool useFallbackTexture;
-		public bool logFallback;
+		public bool UseFallbackTexture;
+		public bool LogFallback;
 
 		/// <summary>
 		/// The part that writes our settings to file. Note that saving is by ref.
 		/// </summary>
 		public override void ExposeData()
 		{
-			Scribe_Values.Look(ref useFallbackTexture, "useFallbackTextures");
-			Scribe_Values.Look(ref logFallback, "logFallback");
+			Scribe_Values.Look(ref UseFallbackTexture, "useFallbackTextures", true);
+			Scribe_Values.Look(ref LogFallback, "logFallback", true);
 			base.ExposeData();
 		}
 

@@ -34,8 +34,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lib.Harmony.2.0.2\lib\net472\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Lib.Harmony.2.0.4\lib\net472\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp, Version=1.2.7558.21380, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -61,6 +61,7 @@
     <Compile Include="HairDefOf.cs" />
     <Compile Include="HairUtility.cs" />
     <Compile Include="Harmony_PawnRenderer.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +71,22 @@
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (
     copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)..\..\v1.2\Assemblies\$(ProjectName).dll"
+) else (
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\About\" "C:\Share\Games\RimWorld.v1.2.2753.ModTest\Mods\Dont Shave Your Head\About\"
+	
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\Assemblies\" "C:\Share\Games\RimWorld.v1.2.2753.ModTest\Mods\Dont Shave Your Head\Assemblies\"
+	
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\Languages\" "C:\Share\Games\RimWorld.v1.2.2753.ModTest\Mods\Dont Shave Your Head\Languages\"
+	
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\v1.1\" "C:\Share\Games\RimWorld.v1.2.2753.ModTest\Mods\Dont Shave Your Head\v1.1\"
+	
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\v1.2\" "C:\Share\Games\RimWorld.v1.2.2753.ModTest\Mods\Dont Shave Your Head\v1.2\"
+	
+	echo F|xcopy /C /Y "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\LoadFolders.xml" "C:\Share\Games\RimWorld.v1.2.2753.ModTest\Mods\Dont Shave Your Head\LoadFolders.xml"
+	
+    copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Share\Games\RimWorld.v1.2.2753.ModTest\Mods\Dont Shave Your Head\v1.2\Assemblies\$(ProjectName).dll"
+	
+	start C:\Share\Games\RimWorld.v1.2.2753.ModTest\RimWorldWin64.exe -quicktest
 )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

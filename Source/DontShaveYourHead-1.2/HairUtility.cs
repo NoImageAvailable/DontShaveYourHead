@@ -7,9 +7,17 @@ using System;
 
 namespace DontShaveYourHead
 {
-	public static class HairUtility
+
+	public interface IHairUtility
 	{
-		private enum Coverage
+		Material GetHairMatFor(Pawn pawn, Rot4 facing);
+	}
+
+	public class HairUtility : IHairUtility
+	{
+		protected readonly ILogger logger;
+
+		protected enum Coverage
 		{
 			None,
 			Jaw,
@@ -17,27 +25,48 @@ namespace DontShaveYourHead
 			FullHead
 		}
 
-
-		private static Dictionary<string, string> textureCache = new Dictionary<string, string>();
-
-		private static Dictionary<Coverage, BodyPartGroupDef> headDefs = new Dictionary<Coverage, BodyPartGroupDef>()
+		public HairUtility(ILogger logger)
 		{
-			{ Coverage.Jaw, BodyPartGroupDefOfDSYH.Teeth },
-			{ Coverage.UpperHead, BodyPartGroupDefOf.UpperHead },
-			{ Coverage.FullHead, BodyPartGroupDefOf.FullHead }
+			this.logger = logger;
+		}
+
+		private static Dictionary<Coverage, string> headDefs = new Dictionary<Coverage, string>()
+		{
+			{ Coverage.Jaw, nameof(BodyPartGroupDefOfDSYH.Teeth) },
+			{ Coverage.UpperHead, nameof(BodyPartGroupDefOf.UpperHead) },
+			{ Coverage.FullHead, nameof(BodyPartGroupDefOf.FullHead) }
 		};
 
-		public static Material GetHairMatFor(Pawn pawn, Rot4 facing)
+		public Material GetHairMatFor(Pawn pawn, Rot4 facing)
 		{
 			// Find maximum coverage of non-mask headwear
-			var maxCoverage = getMaxCoverage(pawn);
+			var maxCoverage = this.getMaxCoverage(pawn);
 
-			string texPath = getTexPath(pawn, maxCoverage);
+			string texPath = this.getTexPath(pawn, maxCoverage);
 
 			return GraphicDatabase.Get<Graphic_Multi>(texPath, ShaderDatabase.Cutout, Vector2.one, pawn.story.hairColor).MatAt(facing); // Set new graphic
 		}
 
-		private static string getTexPath(Pawn pawn, Coverage maxCoverage)
+		private Coverage getMaxCoverage(Pawn pawn)
+		{
+			var maxCoverage = Coverage.None;
+
+			//dubs bad hygeine clears apparelGraphics when washing, so only check for coverage if the pawn's headgear is actually rendered
+			if (pawn.Drawer.renderer.graphics.apparelGraphics.Any())
+			{
+				//flattening body part groups, and joining to head defs
+				var bodyPartGroups = from apparel in pawn.apparel.WornApparel.Where(c => !c.def.apparel.hatRenderedFrontOfFace)
+									 from bodyPartGroup in apparel.def.apparel.bodyPartGroups
+									 join headDef in headDefs on bodyPartGroup.defName equals headDef.Value
+									 select headDef;
+
+				maxCoverage = bodyPartGroups.DefaultIfEmpty().Max(b => b.Key); //finding the max head def coverage
+			}
+
+			return maxCoverage;
+		}
+
+		protected virtual string getTexPath(Pawn pawn, Coverage maxCoverage)
 		{
 			// get current hair path
 			var texPath = pawn.story.hairDef.texPath;
@@ -47,10 +76,41 @@ namespace DontShaveYourHead
 			// if there's something covering the hair
 			if (maxCoverage != Coverage.None)
 			{
-				if (Controller.settings.useFallbackTexture && textureCache.ContainsKey(texPath))
+				// Check if custom texture path exists
+				if (!ContentFinder<Texture2D>.Get($"{texPath}/{maxCoverageString}_south", false))
+				{
+					//if no custom texture return shaved
+					return HairDefOf.Shaved.texPath;
+				}
+
+				return $"{texPath}/{maxCoverageString}";
+			}
+			else
+			{
+				return texPath;
+			}
+		}
+	}
+
+	public class HairUtility_Fallback : HairUtility
+	{
+		private Dictionary<string, string> textureCache = new Dictionary<string, string>();
+
+		public HairUtility_Fallback(ILogger logger) : base(logger) { }
+
+		protected override string getTexPath(Pawn pawn, Coverage maxCoverage)
+		{
+			// get current hair path
+			var texPath = pawn.story.hairDef.texPath;
+			string maxCoverageString = maxCoverage.ToString();
+
+			// if there's something covering the hair
+			if (maxCoverage != Coverage.None)
+			{
+				if (this.textureCache.ContainsKey(texPath))
 				{
 					//get texture from cache if fallback textures are being used
-					texPath = textureCache[texPath];
+					texPath = this.textureCache[texPath];
 				}
 				else
 				{
@@ -58,34 +118,25 @@ namespace DontShaveYourHead
 					if (!ContentFinder<Texture2D>.Get($"{texPath}/{maxCoverageString}_south", false))
 					{
 						//couldn't find a custom texture, get a semi-random fallback
-						if (Controller.settings.useFallbackTexture)
+
+						//get lowest pixel to estimate hair length
+						int lowestPixelPercentage = this.getLowestPixelPercentage(pawn, texPath, Rot4.East);
+
+						//get the fallback hairs for the pixel range
+						var fallback = this.fallbackTextures.Where(d => d.PixelRangePercent.ContainsValue(lowestPixelPercentage)).FirstOrDefault().Textures;
+
+						if (fallback.Any())
 						{
-							//get lowest pixel to estimate hair length
-							int lowestPixelPercentage = getLowestPixelPercentage(pawn, texPath, Rot4.East);
+							//get hair name from path
+							var currentHairName = texPath.Split('/').Last();
 
-							//get the fallback hairs for the pixel range
-							var fallback = fallbackTextures.Where(d => d.PixelRangePercent.ContainsValue(lowestPixelPercentage)).FirstOrDefault().Textures;
+							//get the closest fallback
+							var closestFallback = fallback.OrderBy(h => h.Name).OrderByDescending(h => h.Name.CompareTo(currentHairName)).First();
 
-							if (fallback.Any())
-							{
-								//get hair name from path
-								var currentHairName = texPath.Split('/').Last();
+							this.logger.LogMessage($"DSYH: {pawn.Name} | {texPath} | {closestFallback.Path}");
 
-								//get the closest fallback
-								var closestFallback = fallback.OrderBy(h => h.Name).OrderByDescending(h => h.Name.CompareTo(currentHairName)).First();
-
-								//adding to cache
-								if (Controller.settings.logFallback)
-									Log.Message($"DSYH: {pawn.Name} | {texPath} | {closestFallback.Path}");
-								
-								textureCache.Add(texPath, closestFallback.Path);
-								texPath = closestFallback.Path;
-							}
-							else
-							{
-								//if can't find a fallback texture, return shaved hair
-								return HairDefOf.Shaved.texPath;
-							}
+							this.textureCache.Add(texPath, closestFallback.Path);
+							texPath = closestFallback.Path;
 						}
 						else
 						{
@@ -102,19 +153,19 @@ namespace DontShaveYourHead
 		}
 
 		//get lowest pixel as percentage of height, to account for different hair resolutions
-		private static int getLowestPixelPercentage(Pawn pawn, string texPath, Rot4 rot)
+		private int getLowestPixelPercentage(Pawn pawn, string texPath, Rot4 rot)
 		{
 			//load the current hair mat
 			var material = GraphicDatabase.Get<Graphic_Multi>(texPath, ShaderDatabase.Cutout, Vector2.one, pawn.story.hairColor).MatAt(rot);
 
 			//get current hair texture
-			Texture2D hairTexture = getReadableTexture((Texture2D)material.mainTexture);
+			Texture2D hairTexture = this.getReadableTexture((Texture2D)material.mainTexture);
 
-			double percentage = ((double)getLowestPixel(hairTexture) / (double)hairTexture.height) * 100;
+			double percentage = ((double)this.getLowestPixel(hairTexture) / (double)hairTexture.height) * 100;
 			return (int)percentage;
 		}
 
-		private static int getLowestPixel(Texture2D hairTexture)
+		private int getLowestPixel(Texture2D hairTexture)
 		{
 			//start from bottom row, iterate to top
 			for (int y = 0; y < hairTexture.height; y++)
@@ -132,28 +183,7 @@ namespace DontShaveYourHead
 			return -1;
 		}
 
-		private static Coverage getMaxCoverage(Pawn pawn)
-		{
-			var maxCoverage = Coverage.None;
-
-			//dubs bad hygeine clears apparelGraphics when washing, so only check for coverage if the pawn's headgear is actually rendered
-			if (pawn.Drawer.renderer.graphics.apparelGraphics.Any())
-			{
-				//flattening body part groups, and joining to head defs
-				var bodyPartGroups = from apparel in pawn.apparel.WornApparel.Where(c => !c.def.apparel.hatRenderedFrontOfFace)
-									 from bodyPartGroup in apparel.def.apparel.bodyPartGroups
-									 join headDef in headDefs on bodyPartGroup equals headDef.Value
-									 select headDef;
-
-				maxCoverage = bodyPartGroups.DefaultIfEmpty().Max(b => b.Key); //finding the max head def coverage
-			}
-
-			return maxCoverage;
-		}
-
-
-
-		private static Texture2D getReadableTexture(Texture2D texture)
+		private Texture2D getReadableTexture(Texture2D texture)
 		{
 			// Create a temporary RenderTexture of the same size as the texture
 			RenderTexture tmp = RenderTexture.GetTemporary(
@@ -207,7 +237,9 @@ namespace DontShaveYourHead
 			}
 		}
 
-		private static List<TexturesForRange> fallbackTextures = new List<TexturesForRange>()
+		//using letters as the Name in order to distribute the entries 'evenly' across the alphabet. The Name is then used to compare against the original hair name
+		//probably a better way to do this, but it 'works'
+		private readonly List<TexturesForRange> fallbackTextures = new List<TexturesForRange>()
 		{
 			new TexturesForRange() { //short
 				PixelRangePercent = new Range<int>(34, 100), //bottom pixel in this range
@@ -257,7 +289,6 @@ namespace DontShaveYourHead
 		};
 	}
 
-
 	/// <summary>The Range class.</summary>
 	/// <typeparam name="T">Generic parameter.</typeparam>
 	public class Range<T> where T : IComparable<T>
@@ -283,5 +314,4 @@ namespace DontShaveYourHead
 			Minimum = min; Maximum = max;
 		}
 	}
-
 }
