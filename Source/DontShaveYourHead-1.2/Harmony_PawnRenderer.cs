@@ -32,7 +32,7 @@ namespace DontShaveYourHead
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			bool afterHairMatAt_NewTemp = false;
-			
+
 			foreach (var code in instructions)
 			{
 				// Apply draw offset for hat rendering i.e. when the original method references YOffset_OnHead, return YOffset_OnHead + YOffset_PostHead

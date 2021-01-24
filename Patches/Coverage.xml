@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+	<Operation Class="PatchOperationAddModExtension">
+		<xpath>/Defs/BodyPartGroupDef[not(defName="Teeth" or defName="UpperHead" or defName="FullHead")]</xpath>
+		<value>
+			<li Class="DontShaveYourHead.BodyPartGroupDefExtension">
+				<Coverage>0</Coverage>
+			</li>
+		</value>
+	</Operation>
+	<Operation Class="PatchOperationAddModExtension">
+		<xpath>/Defs/BodyPartGroupDef[defName="Teeth"]</xpath>
+		<value>
+			<li Class="DontShaveYourHead.BodyPartGroupDefExtension">
+				<Coverage>1</Coverage>
+			</li>
+		</value>
+	</Operation>
+	<Operation Class="PatchOperationAddModExtension">
+		<xpath>/Defs/BodyPartGroupDef[defName="UpperHead"]</xpath>
+		<value>
+			<li Class="DontShaveYourHead.BodyPartGroupDefExtension">
+				<Coverage>2</Coverage>
+			</li>
+		</value>
+	</Operation>
+	<Operation Class="PatchOperationAddModExtension">
+		<xpath>/Defs/BodyPartGroupDef[defName="FullHead"]</xpath>
+		<value>
+			<li Class="DontShaveYourHead.BodyPartGroupDefExtension">
+				<Coverage>3</Coverage>
+			</li>
+		</value>
+	</Operation>
+
+
+</Patch>

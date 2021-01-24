@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<!-- 
+	bottomPixelRange is the range for the bottom pixel of a texture to fall in to determines the type of hair (measured in percentage, to account for different texture sizes)
+	
+	e.g. 
+		if the bottom pixel of the texture is at 50, then it's FallbackTextures_Short
+		if the bottom pixel of the texture is at 72, then it's FallbackTextures_Medium
+		if the bottom pixel of the texture is at 87, then it's FallbackTextures_Long
+	-->
+	
+	<DontShaveYourHead.FallbackTextureListDef>
+		<defName>FallbackTextures_Short</defName>
+		<bottomPixelRange>
+			<start>0</start>
+			<end>66</end>
+		</bottomPixelRange>
+		<texturePathList>
+			<li>Things/Pawn/Humanlike/Hairs/Mop</li>
+			<li>Hair/nbi_jamie</li>
+			<li>Things/Pawn/Humanlike/Hairs/Burgundy</li>
+			<li>Hair/nbi_upchuck</li>
+			<li>Hair/SPSFrat</li>
+			<li>Hair/SPSJay</li>
+			<li>Hair/nbi_jeffy</li>
+			<li>Hair/nbi_jack</li>	
+		</texturePathList>
+	</DontShaveYourHead.FallbackTextureListDef>	
+	
+	<DontShaveYourHead.FallbackTextureListDef>
+		<defName>FallbackTextures_Medium</defName>
+		<bottomPixelRange>
+			<start>67</start>
+			<end>80</end>
+		</bottomPixelRange>
+		<texturePathList>
+			<li>Things/Pawn/Humanlike/Hairs/Flowy</li>
+			<li>Hair/ED</li>
+			<li>Hair/KE</li>
+			<li>Hair/nbi_short</li>
+			<li>Hair/nbi_tom</li>
+			<li>Hair/nbi_trent</li>
+			<li>Hair/PA</li>
+			<li>Hair/SPSSlick</li>	
+			<li>Things/Pawn/Humanlike/Hairs/Curly</li>	
+			<li>Hairs/LittleBird</li>	
+		</texturePathList>
+	</DontShaveYourHead.FallbackTextureListDef>	
+	
+	<DontShaveYourHead.FallbackTextureListDef>
+		<defName>FallbackTextures_Long</defName>
+		<bottomPixelRange>
+			<start>81</start>
+			<end>100</end>
+		</bottomPixelRange>
+		<texturePathList>
+			<li>Hairs/Braid</li>
+			<li>Hairs/ClassyF</li>
+			<li>Hairs/Hasslefree</li>
+			<li>Hairs/Ponytail</li>
+			<li>Hairs/StraightLong</li>
+			<li>Hair/nbi_curly</li>
+			<li>Hair/nbi_mel</li>
+			<li>Hair/nbi_regal</li>	
+			<li>Hair/nbi_sandi</li>	
+			<li>Hair/nbi_witch</li>	
+		</texturePathList>
+	</DontShaveYourHead.FallbackTextureListDef>	
+</Defs>
