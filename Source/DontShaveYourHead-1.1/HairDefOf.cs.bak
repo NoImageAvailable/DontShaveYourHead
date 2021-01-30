@@ -8,8 +8,9 @@ using UnityEngine;
 
 namespace DontShaveYourHead
 {
-    public static class BodyPartGroupDefOfDSYH
+    [DefOf]
+    public static class HairDefOf
     {
-        public static BodyPartGroupDef Teeth;
+        public static HairDef Shaved;
     }
 }

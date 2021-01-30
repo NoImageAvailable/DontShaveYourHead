@@ -11,6 +11,7 @@ namespace DontShaveYourHead
     [DefOf]
     public static class HairDefOf
     {
-        public static HairDef Shaved;
+        public static HairDef Shaved; //gets the shaved hair def
     }
+
 }

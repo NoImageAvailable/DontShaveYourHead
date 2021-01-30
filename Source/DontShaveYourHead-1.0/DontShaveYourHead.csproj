@@ -51,13 +51,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BodyPartGroupDefOfDSYH.cs" />
+    <Compile Include="BodyPartGroupDefs.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="CoverageType.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="FallbackTextureListDef.cs" />
+    <Compile Include="FallbackTextures.cs" />
     <Compile Include="HairDefOf.cs" />
     <Compile Include="HairUtility.cs" />
     <Compile Include="Harmony_PawnRenderer.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="MD5Utility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextureUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -72,6 +78,10 @@
 	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\Assemblies\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\Assemblies\"
 	
 	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\Languages\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\Languages\"
+
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\Defs\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\Defs\"
+
+	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\Patches\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\Patches\"
 	
 	xcopy /C /Y /E /I "C:\Dropbox\Visual Studio Repos\RimWorld\DontShaveYourHead\v1.1\" "C:\Share\Games\RimWorld.v1.0.2282\Mods\Dont Shave Your Head\v1.1\"
 	

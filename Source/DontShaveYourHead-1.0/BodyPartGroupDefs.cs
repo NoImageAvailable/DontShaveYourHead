@@ -12,4 +12,9 @@ namespace DontShaveYourHead
     {
         public static BodyPartGroupDef Teeth;
     }
+    public class BodyPartGroupDefExtension : DefModExtension
+    {
+        public Enums.Coverage Coverage;
+    }
+
 }

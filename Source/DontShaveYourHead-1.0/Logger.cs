@@ -15,12 +15,12 @@ namespace DontShaveYourHead
 	{
 		public void LogMessage(string message)
 		{
-			Log.Message($"DSYH: {message}");
+			Log.Message($"DSYH: {message}", true);
 		}
 	}
 
 	public class Logger_Nothing : ILogger
 	{
-		public void LogMessage(string message) { }
+		public void LogMessage(string message){} //just consume log message
 	}
 }
